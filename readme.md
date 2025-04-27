@@ -18,7 +18,8 @@
 - **后端**：Next.js API Routes, Server Actions
 - **数据库**：PostgreSQL (Neon)
 - **认证**：基于Cookie的自定义认证系统
-- **AI集成**：Coze API 流式对话
+- **AI集成**：Coze API 流式对话和Wrenai
+
 
 ## 环境
 ### 云端
@@ -27,17 +28,19 @@ https://v0-user-dialog-agent.vercel.app/chat
 https://console.neon.tech/app/projects/solitary-snow-57570766
 ### COZE  
 https://www.coze.cn/space/7366561614713126953/project-ide/7495219630069006374
+调用：https://www.coze.cn/open/playground/chat_v3
 ### wrenai
 https://cloud.getwren.ai/projects/5965/home/6737
 ### github 
 https://github.com/gentlegant/nationalPark_text2sql
 
 
+
 ## 安装和启动
 
 ### 前提条件
 
-- Node.js 18+ 
+- Node.js 20+ 
 - npm 或 yarn
 - PostgreSQL 数据库
 
@@ -46,22 +49,34 @@ https://github.com/gentlegant/nationalPark_text2sql
 创建一个`.env.local`文件，添加以下环境变量：
 
 ```
-# 数据库连接
-DATABASE_URL=postgres://username:password@host:port/database
-POSTGRES_URL=postgres://username:password@host:port/database
+# Recommended for most uses
+DATABASE_URL=postgres://neondb_owner:npg_5d9QXgoDfjBM@ep-yellow-night-a4do52f9-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
 
-# 认证
-NEXTAUTH_SECRET=your-secret-key
+# For uses requiring a connection without pgbouncer
+DATABASE_URL_UNPOOLED=postgresql://neondb_owner:npg_5d9QXgoDfjBM@ep-yellow-night-a4do52f9.us-east-1.aws.neon.tech/neondb?sslmode=require
 
-# Coze API (智能对话)
-COZE_API_KEY=your-coze-api-key
-COZE_BOT_ID=your-coze-bot-id
+# Parameters for constructing your own connection string
+PGHOST=ep-yellow-night-a4do52f9-pooler.us-east-1.aws.neon.tech
+PGHOST_UNPOOLED=ep-yellow-night-a4do52f9.us-east-1.aws.neon.tech
+PGUSER=neondb_owner
+PGDATABASE=neondb
+PGPASSWORD=npg_5d9QXgoDfjBM
+
+# Parameters for Vercel Postgres Templates
+POSTGRES_URL=postgres://neondb_owner:npg_5d9QXgoDfjBM@ep-yellow-night-a4do52f9-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require
+POSTGRES_URL_NON_POOLING=postgres://neondb_owner:npg_5d9QXgoDfjBM@ep-yellow-night-a4do52f9.us-east-1.aws.neon.tech/neondb?sslmode=require
+POSTGRES_USER=neondb_owner
+POSTGRES_HOST=ep-yellow-night-a4do52f9-pooler.us-east-1.aws.neon.tech
+POSTGRES_PASSWORD=npg_5d9QXgoDfjBM
+POSTGRES_DATABASE=neondb
+POSTGRES_URL_NO_SSL=postgres://neondb_owner:npg_5d9QXgoDfjBM@ep-yellow-night-a4do52f9-pooler.us-east-1.aws.neon.tech/neondb
+POSTGRES_PRISMA_URL=postgres://neondb_owner:npg_5d9QXgoDfjBM@ep-yellow-night-a4do52f9-pooler.us-east-1.aws.neon.tech/neondb?connect_timeout=15&sslmode=require
 ```
 
 ### 本地启动
 
 ```bash
-
+###首先安装NPM
 
 npm install yarn -g
 

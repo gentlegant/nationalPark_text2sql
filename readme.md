@@ -21,10 +21,16 @@
 - **AI集成**：Coze API 流式对话
 
 ## 环境
-### 云端：https://v0-user-dialog-agent.vercel.app/chat
-### Neon： https://console.neon.tech/app/projects/solitary-snow-57570766
-### COZE:  https://www.coze.cn/space/7366561614713126953/project-ide/7495219630069006374
-### wrenai: https://cloud.getwren.ai/projects/5965/home/6737
+### 云端
+https://v0-user-dialog-agent.vercel.app/chat
+### Neon
+https://console.neon.tech/app/projects/solitary-snow-57570766
+### COZE  
+https://www.coze.cn/space/7366561614713126953/project-ide/7495219630069006374
+### wrenai
+https://cloud.getwren.ai/projects/5965/home/6737
+### github 
+https://github.com/gentlegant/nationalPark_text2sql
 
 
 ## 安装和启动

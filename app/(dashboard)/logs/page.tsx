@@ -32,11 +32,6 @@ export default function LogsPage() {
     const fetchCurrentUser = async () => {
       const user = await getCurrentUser()
       setCurrentUser(user)
-
-      // 如果用户不是管理员，重定向到仪表板
-      if (user && user.role !== "admin") {
-        window.location.href = "/dashboard"
-      }
     }
 
     fetchCurrentUser()

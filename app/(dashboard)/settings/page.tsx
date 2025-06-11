@@ -1,40 +1,42 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { NotificationSettings } from "@/components/settings/notification-settings"
-import { ThemeSettings } from "@/components/settings/theme-settings"
-import { LanguageSettings } from "@/components/settings/language-settings"
-import { Separator } from "@/components/ui/separator"
-import { Loader2, AlertCircle, RefreshCw } from "lucide-react"
-import { getUserPreferences, type UserPreferences } from "@/app/actions/settings-actions"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { NotificationSettings } from "@/components/settings/notification-settings";
+import { ThemeSettings } from "@/components/settings/theme-settings";
+import { Separator } from "@/components/ui/separator";
+import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import {
+  getUserPreferences,
+  type UserPreferences,
+} from "@/app/actions/settings-actions";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function SettingsPage() {
-  const [preferences, setPreferences] = useState<UserPreferences | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [preferences, setPreferences] = useState<UserPreferences | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   async function fetchPreferences() {
     try {
-      setLoading(true)
-      setError(null)
-      console.log("开始获取用户设置")
-      const prefs = await getUserPreferences()
-      console.log("获取到用户设置:", prefs)
-      setPreferences(prefs)
+      setLoading(true);
+      setError(null);
+      console.log("开始获取用户设置");
+      const prefs = await getUserPreferences();
+      console.log("获取到用户设置:", prefs);
+      setPreferences(prefs);
     } catch (err) {
-      console.error("获取设置失败:", err)
-      setError("加载设置失败，请稍后再试")
+      console.error("获取设置失败:", err);
+      setError("加载设置失败，请稍后再试");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   useEffect(() => {
-    fetchPreferences()
-  }, [])
+    fetchPreferences();
+  }, []);
 
   if (loading) {
     return (
@@ -42,7 +44,7 @@ export default function SettingsPage() {
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
         <p className="text-muted-foreground">正在加载设置...</p>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -54,23 +56,27 @@ export default function SettingsPage() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
         <div className="flex justify-center">
-          <Button onClick={fetchPreferences} variant="outline" className="flex items-center gap-2">
+          <Button
+            onClick={fetchPreferences}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
             <RefreshCw className="h-4 w-4" />
             重试
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   // 如果没有获取到设置，使用默认设置
   const defaultPreferences: UserPreferences = {
     notification_enabled: true,
-    theme: "system",
+    theme: "light",
     language: "zh-CN",
-  }
+  };
 
-  const userPreferences = preferences || defaultPreferences
+  const userPreferences = preferences || defaultPreferences;
 
   return (
     <div className="container mx-auto py-6">
@@ -81,25 +87,20 @@ export default function SettingsPage() {
 
       <Separator className="my-6" />
 
-      <Tabs defaultValue="notifications" className="space-y-6">
+      <Tabs defaultValue="appearance" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="notifications">通知</TabsTrigger>
           <TabsTrigger value="appearance">外观</TabsTrigger>
-          <TabsTrigger value="language">语言</TabsTrigger>
+          <TabsTrigger value="notifications">通知</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="appearance" className="space-y-6">
+          <ThemeSettings />
+        </TabsContent>
 
         <TabsContent value="notifications" className="space-y-6">
           <NotificationSettings initialSettings={userPreferences} />
         </TabsContent>
-
-        <TabsContent value="appearance" className="space-y-6">
-          <ThemeSettings initialSettings={userPreferences} />
-        </TabsContent>
-
-        <TabsContent value="language" className="space-y-6">
-          <LanguageSettings initialSettings={userPreferences} />
-        </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

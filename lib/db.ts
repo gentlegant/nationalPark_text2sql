@@ -39,6 +39,7 @@ export async function executeQuery(query: string, params: any[] = []) {
 
     // 确保我们正确地访问结果中的行数据
     if (result && result.rows) {
+      console.log("Result:", result.rows);
       return { success: true, data: result.rows };
     } else if (result) {
       // 如果没有rows属性但结果存在，可能是其他格式

@@ -20,6 +20,7 @@ import {
   type Wildlife,
   type WildlifeCategory,
   type WildlifeFormData,
+  createWildlife,
 } from "@/app/actions/wildlife-actions";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -56,6 +57,7 @@ export default function WildlifePage() {
   const [isLoadingPlants, setIsLoadingPlants] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editingWildlife, setEditingWildlife] = useState<Wildlife | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imagePreviewOpen, setImagePreviewOpen] = useState(false);
@@ -148,10 +150,78 @@ export default function WildlifePage() {
 
   // 处理添加记录
   const handleAdd = () => {
-    toast({
-      title: "功能开发中",
-      description: "添加新记录功能正在开发中，敬请期待！",
+    setFormData({
+      name: "",
+      scientific_name: "",
+      category_id: 0,
+      description: "",
+      habitat: "",
+      conservation_status: "",
+      image_url: "",
     });
+    setAddDialogOpen(true);
+  };
+
+  // 处理添加提交
+  const handleAddSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!currentUser) {
+      toast({
+        title: "操作失败",
+        description: "请先登录",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const result = await createWildlife(formData, currentUser.id);
+
+      if (result.success) {
+        toast({
+          title: "添加成功",
+          description: `已添加${
+            formData.category_id === 1 ? "动物" : "植物"
+          }：${formData.name}`,
+        });
+
+        setAddDialogOpen(false);
+        setFormData({
+          name: "",
+          scientific_name: "",
+          category_id: 0,
+          description: "",
+          habitat: "",
+          conservation_status: "",
+          image_url: "",
+        });
+
+        // 重新获取数据
+        if (formData.category_id === 1) {
+          fetchAnimals();
+        } else {
+          fetchPlants();
+        }
+      } else {
+        toast({
+          title: "添加失败",
+          description: result.error || "添加失败，请稍后再试",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Add error:", error);
+      toast({
+        title: "添加失败",
+        description: "发生错误，请稍后再试",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // 处理编辑
@@ -422,6 +492,146 @@ export default function WildlifePage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* 添加对话框 */}
+      <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>添加新记录</DialogTitle>
+            <DialogDescription>
+              填写以下信息来添加新的动植物记录。
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleAddSubmit} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="add-name">名称 *</Label>
+                <Input
+                  id="add-name"
+                  value={formData.name}
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
+                  }
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="add-scientific_name">学名 *</Label>
+                <Input
+                  id="add-scientific_name"
+                  value={formData.scientific_name}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      scientific_name: e.target.value,
+                    })
+                  }
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-category_id">分类 *</Label>
+              <Select
+                value={formData.category_id.toString()}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, category_id: parseInt(value) })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="选择分类" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-description">描述 *</Label>
+              <Textarea
+                id="add-description"
+                value={formData.description}
+                onChange={(e) =>
+                  setFormData({ ...formData, description: e.target.value })
+                }
+                required
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="add-habitat">栖息地/生长环境</Label>
+                <Input
+                  id="add-habitat"
+                  value={formData.habitat}
+                  onChange={(e) =>
+                    setFormData({ ...formData, habitat: e.target.value })
+                  }
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="add-conservation_status">保护状态</Label>
+                <Input
+                  id="add-conservation_status"
+                  value={formData.conservation_status}
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      conservation_status: e.target.value,
+                    })
+                  }
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-image_url">图片URL</Label>
+              <Input
+                id="add-image_url"
+                value={formData.image_url}
+                onChange={(e) =>
+                  setFormData({ ...formData, image_url: e.target.value })
+                }
+                placeholder="https://example.com/image.jpg"
+              />
+            </div>
+
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setAddDialogOpen(false)}
+                disabled={isSubmitting}
+              >
+                取消
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    添加中...
+                  </>
+                ) : (
+                  "添加"
+                )}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* 编辑对话框 */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>

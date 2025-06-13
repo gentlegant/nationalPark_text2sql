@@ -64,6 +64,18 @@ export function AnnouncementForm({
         image_url: announcement.image_url,
         is_published: announcement.is_published,
       });
+    } else {
+      // 重置为新增模式的默认值
+      setFormData({
+        title: "",
+        content: "",
+        type: "announcement",
+        start_date: new Date().toISOString().split("T")[0],
+        end_date: new Date().toISOString().split("T")[0],
+        location: "",
+        image_url: "",
+        is_published: true,
+      });
     }
   }, [announcement]);
 
